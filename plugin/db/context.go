@@ -1,13 +1,18 @@
 package db
 
-import "context"
+// import (
+// 	"context"
 
-type contextKeyTx struct{}
+// 	"go.mongodb.org/mongo-driver/mongo"
+// )
 
-func OfContext(ctx context.Context) {
-	ctx.Value(contextKeyTx{})
-}
+// type contextKeyTx struct{}
 
-func WithContext(ctx context.Context, value any) context.Context {
-	return context.WithValue(ctx, contextKeyTx{}, value)
-}
+// func OfContext(ctx context.Context) (*mongo.Collection, bool) {
+// 	coll, ok := ctx.Value(contextKeyTx{}).(*mongo.Collection)
+// 	return coll, ok
+// }
+
+// func WithContext(ctx context.Context, value *mongo.Collection) context.Context {
+// 	return context.WithValue(ctx, contextKeyTx{}, value)
+// }
