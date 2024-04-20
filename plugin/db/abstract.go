@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"time"
 
@@ -28,19 +27,25 @@ func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error)
 		return nil, ErrInvalidType
 	}
 
-	id, err := primitive.ObjectIDFromHex(fmt.Sprintf("%v", v.GetID()))
-	if err != nil {
+	var filter primitive.M
+
+	switch v.GetID().(type) {
+	case string:
+		id, err := primitive.ObjectIDFromHex(v.GetID().(string))
+		if err != nil {
+			return nil, err
+		}
+		filter = bson.M{"_id": id}
+	default:
+		filter = bson.M{"_id": v.GetID().(primitive.ObjectID)}
+	}
+
+	var result T
+	if err := a.coll.FindOne(ctx, filter).Decode(&result); err != nil {
 		return nil, err
 	}
 
-	filter := bson.M{"_id": id}
-
-	var result *T
-	if err := a.coll.FindOne(ctx, filter).Decode(result); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return &result, nil
 }
 
 func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error) {
@@ -56,7 +61,7 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 		return nil, err
 	}
 
-	if err := setField(entity, "ID", res.InsertedID.(primitive.ObjectID).Hex()); err != nil {
+	if err := setField(entity, "ID", res.InsertedID); err != nil {
 		return nil, err
 	}
 

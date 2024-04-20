@@ -9,4 +9,4 @@ docker compose up -d
 go test -race -count=1 ./...
 ```
 
-> Ensure the port `27017` is free to use or change `docker-compose.yaml` and `tests_test.go` files to appropriate port.
+> Make sure port `27017` is available for use, or modify the `docker-compose.yaml` and `tests_test.go` files to use an appropriate port.

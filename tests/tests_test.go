@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/jesusrj/go-mongo/plugin/db"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -15,6 +17,7 @@ import (
 const mongDSN = "mongodb://root:MongoPass321!@localhost:27017"
 
 var Database *mongo.Database
+var KnowledIDs []string
 
 func init() {
 	ctx := context.Background()
@@ -42,9 +45,12 @@ func init() {
 func seed() {
 	ctx := context.Background()
 
-	repoUsers := db.NewRepository[User](Database.Collection(CollUser))
+	Database.Collection(CollUser).Drop(ctx)
 
-	for _, id := range StaticID {
-		repoUsers.Save(ctx, GetUser("", Config{ID: id}))
+	repoUsers := db.NewRepository[User](Database.Collection(CollUser))
+	for x, v := range StaticID {
+		if id, err := primitive.ObjectIDFromHex(v); err == nil {
+			repoUsers.Save(ctx, GetUser("user_"+strconv.Itoa(x), Config{ID: id}))
+		}
 	}
 }

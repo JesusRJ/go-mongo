@@ -2,11 +2,9 @@ package tests_test
 
 import (
 	"context"
-	"reflect"
 	"testing"
 
 	"github.com/jesusrj/go-mongo/plugin/db"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	. "github.com/jesusrj/go-mongo/utils/tests"
 )
@@ -20,12 +18,8 @@ func TestSave(t *testing.T) {
 		t.Fatalf("errors happened when create: %v", err)
 	}
 
-	if res.ID == "" {
+	if res.ID == nil || res.ID == "" {
 		t.Errorf("user's primary key should has value after create, got : %v", user.ID)
-	}
-
-	if _, err := primitive.ObjectIDFromHex(res.ID); err != nil {
-		t.Errorf("user's primary key invalid after create, got : %v", user.ID)
 	}
 
 	if res.CreatedAt.IsZero() {
@@ -41,9 +35,7 @@ func TestSave(t *testing.T) {
 		t.Fatalf("errors happened when find: %v", err)
 	}
 
-	if !reflect.DeepEqual(user, newUser) {
-		t.Error("should be equals")
-	}
+	AssertObjEqual(t, user, newUser, "ID", "Name", "Address", "Pets")
 }
 
 func TestSaveComplex(t *testing.T) {

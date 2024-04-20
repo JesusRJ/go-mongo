@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	ID   string
+	ID   any
 	Pets int
 }
 
