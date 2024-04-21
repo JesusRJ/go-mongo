@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"reflect"
 	"time"
 
 	"github.com/jesusrj/go-mongo/core"
@@ -11,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type AbstractRepository[T any] struct {
+type AbstractRepository[T core.AbstractEntity] struct {
 	coll *mongo.Collection
 }
 
@@ -22,22 +21,9 @@ func NewRepository[T core.AbstractEntity](coll *mongo.Collection) core.AbstractR
 }
 
 func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error) {
-	v, ok := any(entity).(interface{ GetID() any })
-	if !ok {
-		return nil, ErrInvalidType
-	}
-
-	var filter primitive.M
-
-	switch v.GetID().(type) {
-	case string:
-		id, err := primitive.ObjectIDFromHex(v.GetID().(string))
-		if err != nil {
-			return nil, err
-		}
-		filter = bson.M{"_id": id}
-	default:
-		filter = bson.M{"_id": v.GetID().(primitive.ObjectID)}
+	filter, err := filterWithID(*entity)
+	if err != nil {
+		return nil, err
 	}
 
 	var result T
@@ -69,14 +55,26 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, error) {
-	v, ok := any(entity).(core.AbstractEntity)
-	if !ok {
-		return nil, ErrInvalidType
+	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && err != ErrFieldNotFound {
+		return nil, err
 	}
 
-	v.GetID()
+	filter, err := filterWithID(*entity)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, nil
+	// remove the ID field
+	setField(entity, "ID", primitive.NilObjectID)
+
+	update := bson.M{"$set": entity}
+
+	_, err = a.coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return nil, err
+	}
+
+	return entity, nil
 }
 
 func (a *AbstractRepository[T]) Delete(ctx context.Context, entity *T) (*T, error) {
@@ -86,19 +84,3 @@ func (a *AbstractRepository[T]) Delete(ctx context.Context, entity *T) (*T, erro
 // func (a *AbstractRepository[T]) Tx(ctx context.Context, fn func(ctx context.Context) error) error {
 // 	return nil
 // }
-
-// TODO: Cache reflection fields to tunning performance
-func setField(target any, fieldName string, value any) error {
-	v := reflect.ValueOf(target).Elem()
-	if !v.CanAddr() {
-		return ErrNotAddressable
-	}
-
-	field := reflect.Indirect(v).FieldByName(fieldName)
-	if !field.IsValid() {
-		return ErrFieldNotFound
-	}
-
-	field.Set(reflect.ValueOf(value))
-	return nil
-}

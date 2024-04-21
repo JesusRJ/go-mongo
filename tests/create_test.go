@@ -10,9 +10,9 @@ import (
 )
 
 func TestSave(t *testing.T) {
-	user := *GetUser("create", Config{})
 	repository := db.NewRepository[User](Database.Collection(CollUser))
 
+	user := *GetUser("create", Config{})
 	res, err := repository.Save(context.TODO(), &user)
 	if err != nil {
 		t.Fatalf("errors happened when create: %v", err)
@@ -38,10 +38,27 @@ func TestSave(t *testing.T) {
 	AssertObjEqual(t, user, newUser, "ID", "Name", "Address", "Pets")
 }
 
-func TestSaveComplex(t *testing.T) {
+func TestCreateLiteral(t *testing.T) {
+	repository := db.NewRepository[LiteralEntity](Database.Collection(CollAny))
 
+	entity := LiteralEntity{Name: "any name", Value: 10}
+	res, err := repository.Save(context.TODO(), &entity)
+	if err != nil {
+		t.Fatalf("errors happened when create: %v", err)
+	}
+
+	if res.ID == "" {
+		t.Errorf("primary key should has value after create, got : %v", entity.ID)
+	}
+
+	newUser, err := repository.Find(context.Background(), &entity)
+	if err != nil {
+		t.Fatalf("errors happened when find: %v", err)
+	}
+
+	AssertObjEqual(t, entity, newUser, "ID", "Name", "Value")
 }
 
-func TestCreateLiteral(t *testing.T) {
+func TestSaveComplex(t *testing.T) {
 
 }

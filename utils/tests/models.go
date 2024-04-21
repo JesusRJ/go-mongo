@@ -6,6 +6,7 @@ const (
 	// Collection names
 	CollUser = "users"
 	CollPets = "pets"
+	CollAny  = "any"
 )
 
 type User struct {
@@ -19,3 +20,12 @@ type Pet struct {
 	db.Entity `bson:"inline"`
 	Name      string `bson:"name"`
 }
+
+// LiteralEntity don't inherity from db.Entity but implements core.AbstractEntity
+type LiteralEntity struct {
+	ID    string `bson:"_id,omitempty"`
+	Name  string
+	Value uint
+}
+
+func (l LiteralEntity) GetID() any { return l.ID }
