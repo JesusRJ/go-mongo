@@ -60,14 +60,49 @@ func TestSetField(t *testing.T) {
 			t.Fatalf("test %s: expected: %v, got: %v", tc.name, tc.want, tc.target)
 		}
 	}
-
 }
 
 func TestFilterWithID(t *testing.T) {
 
+	tt := []struct {
+		name      string
+		input     entity
+		want      primitive.M
+		wantError bool
+	}{
+		{
+			name:  "Success",
+			input: entity{objectID("661f22bf8a35841050e85503")},
+			want:  primitive.M{"_id": objectID("661f22bf8a35841050e85503")},
+		},
+		{
+			name:  "Success String",
+			input: entity{"661f22bf8a35841050e85503"},
+			want:  primitive.M{"_id": objectID("661f22bf8a35841050e85503")},
+		},
+	}
+
+	for _, tc := range tt {
+		got, err := filterWithID(tc.input)
+		if err != nil && !tc.wantError {
+			t.Fatalf("test %s: expected: %v, got erro: %v", tc.name, tc.want, err)
+		}
+
+		if !reflect.DeepEqual(got, tc.want) {
+			t.Fatalf("test %s: expected: %v, got: %v", tc.name, tc.want, got)
+		}
+	}
 }
 
 func objectID(id string) primitive.ObjectID {
 	obj, _ := primitive.ObjectIDFromHex(id)
 	return obj
+}
+
+type entity struct {
+	ID any
+}
+
+func (e entity) GetID() any {
+	return e.ID
 }
