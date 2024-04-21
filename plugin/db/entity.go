@@ -8,10 +8,10 @@ import (
 
 // Entity is a struct to be used as base for entities
 type Entity struct {
-	ID        any       `json:"id" bson:"_id,omitempty"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at,omitempty"`
-	DeletedAt time.Time `json:"deleted_at" bson:"deleted_at,omitempty"`
+	ID        any       `bson:"_id,omitempty"`
+	CreatedAt time.Time `bson:"created_at,omitempty"`
+	UpdatedAt time.Time `bson:"updated_at,omitempty"`
+	DeletedAt time.Time `bson:"deleted_at,omitempty"`
 }
 
 // Ensure of Entity implements AbstractEntity
