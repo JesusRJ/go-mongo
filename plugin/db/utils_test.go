@@ -94,6 +94,16 @@ func TestFilterWithID(t *testing.T) {
 	}
 }
 
+func TestToBsonM(t *testing.T) {
+	toBsonM(struct {
+		ID   primitive.ObjectID `bson:"_id,omitempty"`
+		Name string             `bson:"name,omitempty"`
+	}{
+		ID:   objectID("661f22bf8a35841050e85503"),
+		Name: "Teste toBson",
+	})
+}
+
 func objectID(id string) primitive.ObjectID {
 	obj, _ := primitive.ObjectIDFromHex(id)
 	return obj

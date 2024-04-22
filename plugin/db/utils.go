@@ -1,10 +1,13 @@
 package db
 
 import (
+	"bytes"
+	"fmt"
 	"reflect"
 
 	"github.com/jesusrj/go-mongo/core"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/bsonrw"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -46,4 +49,27 @@ func filterWithID[T core.AbstractEntity](entity T) (primitive.M, error) {
 		return bson.M{"_id": id}, nil
 	}
 	return bson.M{"_id": v.GetID().(primitive.ObjectID)}, nil
+}
+
+func toBsonM(e any) (bson.M, error) {
+	buf := new(bytes.Buffer)
+	vw, err := bsonrw.NewBSONValueWriter(buf)
+	if err != nil {
+		panic(err)
+	}
+	encoder, err := bson.NewEncoder(vw)
+	if err != nil {
+		panic(err)
+	}
+
+	registry := bson.NewRegistry()
+	registry.RegisterTypeMapEntry(bson.TypeObjectID, reflect.TypeOf(nil))
+	encoder.SetRegistry(registry)
+
+	if err := encoder.Encode(e); err != nil {
+		return nil, err
+	}
+
+	fmt.Println(bson.Raw(buf.Bytes()).String())
+	return nil, nil
 }
