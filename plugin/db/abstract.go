@@ -6,7 +6,6 @@ import (
 
 	"github.com/jesusrj/go-mongo/core"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -64,8 +63,12 @@ func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, erro
 		return nil, err
 	}
 
-	// remove the ID field
-	setField(entity, "ID", primitive.NilObjectID)
+	// Set ID as primitive.ObjectID
+	id, err := getObjectID(*entity)
+	if err != nil {
+		return nil, err
+	}
+	setField(entity, "ID", id)
 
 	update := bson.M{"$set": entity}
 
