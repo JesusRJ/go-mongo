@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/jesusrj/go-mongo/core"
@@ -34,10 +35,10 @@ func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error) {
-	if err := setField(entity, "CreatedAt", time.Now()); err != nil && err != ErrFieldNotFound {
+	if err := setField(entity, "CreatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
 		return nil, err
 	}
-	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && err != ErrFieldNotFound {
+	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
 		return nil, err
 	}
 
@@ -54,7 +55,7 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, error) {
-	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && err != ErrFieldNotFound {
+	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
 		return nil, err
 	}
 
