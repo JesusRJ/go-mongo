@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func AssertObjEqual(t *testing.T, r, e interface{}, names ...string) {
@@ -111,7 +113,7 @@ func AssertEqual(t *testing.T, got, expect interface{}) {
 	}
 }
 
-func Now() *time.Time {
-	now := time.Now()
-	return &now
+func ObjectIDFromHex(hex string) primitive.ObjectID {
+	id, _ := primitive.ObjectIDFromHex(hex)
+	return id
 }

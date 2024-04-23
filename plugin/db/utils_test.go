@@ -63,7 +63,6 @@ func TestSetField(t *testing.T) {
 }
 
 func TestFilterWithID(t *testing.T) {
-
 	tt := []struct {
 		name      string
 		input     entity

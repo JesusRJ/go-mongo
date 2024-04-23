@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/jesusrj/go-mongo/core"
@@ -35,10 +34,8 @@ func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error) {
-	if err := setFields(entity, map[string]any{
-		"CreatedAt": time.Now(),
-		"UpdatedAt": time.Now(),
-	}); err != nil {
+	now := time.Now()
+	if err := setOptionalFields(entity, map[string]any{"CreatedAt": now, "UpdatedAt": now}); err != nil {
 		return nil, err
 	}
 
@@ -47,7 +44,7 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 		return nil, err
 	}
 
-	if err := setField(entity, "ID", res.InsertedID); err != nil {
+	if err := setOptionalField(entity, "ID", res.InsertedID); err != nil {
 		return nil, err
 	}
 
@@ -55,24 +52,25 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, error) {
-	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
+	if err := setOptionalFields(entity, map[string]any{"UpdatedAt": time.Now()}); err != nil {
 		return nil, err
 	}
 
-	filter, err := filterWithID(*entity)
-	if err != nil {
-		return nil, err
-	}
-
-	// Set ID as primitive.ObjectID
 	id, err := getObjectID(*entity)
 	if err != nil {
 		return nil, err
 	}
-	setField(entity, "ID", id)
 
-	update := bson.M{"$set": entity}
+	// Preserve entity parameter
+	cp := *entity
 
+	// Set ID as primitive.ObjectID
+	if err := setOptionalField(&cp, "ID", id); err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": id}
+	update := bson.M{"$set": cp}
 	_, err = a.coll.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, err
@@ -81,8 +79,17 @@ func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, erro
 	return entity, nil
 }
 
+// TODO: Implement logical exclusion option.
 func (a *AbstractRepository[T]) Delete(ctx context.Context, entity *T) (*T, error) {
-	return nil, nil
+	filter, err := filterWithID(*entity)
+	if err != nil {
+		return nil, err
+	}
+	_, err = a.coll.DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	return entity, nil
 }
 
 // func (a *AbstractRepository[T]) Tx(ctx context.Context, fn func(ctx context.Context) error) error {

@@ -38,7 +38,7 @@ func TestSave(t *testing.T) {
 	AssertObjEqual(t, user, newUser, "ID", "Name", "Address", "Pets")
 }
 
-func TestCreateLiteral(t *testing.T) {
+func TestCreateLiteralWithID(t *testing.T) {
 	repository := db.NewRepository[LiteralEntity](Database.Collection(CollAny))
 
 	entity := LiteralEntity{Name: "any name", Value: 10}
@@ -57,6 +57,20 @@ func TestCreateLiteral(t *testing.T) {
 	}
 
 	AssertObjEqual(t, entity, newUser, "ID", "Name", "Value")
+}
+
+func TestCreateLiteralWithoutID(t *testing.T) {
+	repository := db.NewRepository[LiteralEntityWithoutID](Database.Collection(CollAny))
+
+	entity := LiteralEntityWithoutID{Name: "any name", Value: 10}
+	res, err := repository.Save(context.TODO(), &entity)
+	if err != nil {
+		t.Fatalf("errors happened when create: %v", err)
+	}
+
+	if res.GetID() != "" {
+		t.Errorf("primary key should has no value after create, got : %v", res.GetID())
+	}
 }
 
 func TestSaveComplex(t *testing.T) {

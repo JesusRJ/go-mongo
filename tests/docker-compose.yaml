@@ -6,6 +6,7 @@ services:
     container_name: mongodb
     restart: unless-stopped
     environment:
+      - TZ=America/Sao_Paulo
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=MongoPass321!
       - MONGO_INITDB_DATABASE=petshop

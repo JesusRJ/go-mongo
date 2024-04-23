@@ -44,7 +44,6 @@ func init() {
 // Populate database with tests values
 func seed() {
 	ctx := context.Background()
-
 	Database.Collection(CollUser).Drop(ctx)
 
 	repoUsers := db.NewRepository[User](Database.Collection(CollUser))

@@ -29,3 +29,10 @@ type LiteralEntity struct {
 }
 
 func (l LiteralEntity) GetID() any { return l.ID }
+
+type LiteralEntityWithoutID struct {
+	Name  string
+	Value uint
+}
+
+func (l LiteralEntityWithoutID) GetID() any { return "" }

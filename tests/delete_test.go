@@ -9,7 +9,7 @@ import (
 	. "github.com/jesusrj/go-mongo/utils/tests"
 )
 
-func TestUpdate(t *testing.T) {
+func TestDelete(t *testing.T) {
 	repository := db.NewRepository[User](Database.Collection(CollUser))
 
 	tt := []struct {
@@ -19,24 +19,20 @@ func TestUpdate(t *testing.T) {
 	}{
 		{
 			name:  "Success Primitive ID",
-			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticID[1]), Address: "Avocato Str.", Pets: 4}),
-			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticID[1]), Address: "Avocato Str.", Pets: 4}),
+			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticID[3])}),
+			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticID[3])}),
 		},
 		{
 			name:  "Success String ID",
-			input: GetUser("update", Config{ID: StaticID[2], Address: "Avocato Str."}),
-			want:  GetUser("update", Config{ID: StaticID[2], Address: "Avocato Str."}),
+			input: GetUser("update", Config{ID: StaticID[4]}),
+			want:  GetUser("update", Config{ID: StaticID[4]}),
 		},
 	}
 
 	for _, tc := range tt {
-		got, err := repository.Update(context.TODO(), tc.input)
+		got, err := repository.Delete(context.TODO(), tc.input)
 		if err != nil {
 			t.Fatalf("test %s: expected: %v, got erro: %v", tc.name, tc.want, err)
-		}
-
-		if got.UpdatedAt.IsZero() {
-			t.Errorf("user's updated at should be not zero")
 		}
 
 		AssertObjEqual(t, got, tc.want, "ID", "Name", "Address", "Pets")

@@ -7,8 +7,9 @@ import (
 )
 
 type Config struct {
-	ID   any
-	Pets int
+	ID      any
+	Pets    int
+	Address string
 }
 
 func GetUser(name string, config Config) *User {
@@ -17,9 +18,8 @@ func GetUser(name string, config Config) *User {
 		Address: "5th Avenue, number 123",
 	}
 
-	if config.ID != "" {
-		user.ID = config.ID
-	}
+	user.ID = config.ID
+	user.Address = config.Address
 
 	for i := 0; i < config.Pets; i++ {
 		user.Pets = append(user.Pets, &Pet{Name: name + "_pet_" + strconv.Itoa(i+1)})

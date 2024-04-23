@@ -11,7 +11,7 @@ type Entity struct {
 	ID        any       `bson:"_id,omitempty"`
 	CreatedAt time.Time `bson:"created_at,omitempty"`
 	UpdatedAt time.Time `bson:"updated_at,omitempty"`
-	DeletedAt time.Time `bson:"deleted_at,omitempty"`
+	// DeletedAt time.Time `bson:"deleted_at,omitempty"` // Reserved to logical exclusion
 }
 
 // Ensure of Entity implements AbstractEntity

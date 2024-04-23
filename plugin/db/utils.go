@@ -10,6 +10,7 @@ import (
 )
 
 // TODO: Cache reflection fields to tunning performance
+
 func setField(target any, fieldName string, value any) error {
 	v := reflect.ValueOf(target).Elem()
 	if !v.CanAddr() {
@@ -36,23 +37,24 @@ func setField(target any, fieldName string, value any) error {
 	return nil
 }
 
-func setFields(target any, fields map[string]any) error {
-	for k, v := range fields {
-		if err := setField(target, k, v); err != nil && !errors.Is(err, ErrFieldNotFound) {
-			return err
-		}
+// setOptionalField set the field on the target object, ignoring if field do not exist.
+func setOptionalField(target any, fieldName string, value any) error {
+	if err := setField(target, fieldName, value); err != nil && !errors.Is(err, ErrFieldNotFound) {
+		return err
 	}
 	return nil
 }
 
-// filterWithID returns a MongoDB filter that targets a specific document by its ID,
-// using the BSON format (bson.M{{"_id", ...}})
-func filterWithID[T core.AbstractEntity](entity T) (bson.M, error) {
-	id, err := getObjectID(entity)
-	if err != nil {
-		return nil, err
+// setOptionalFields sets each field on the target object, ignoring fields that do not exist.
+// It iterates through the fields map and calls the setField function to set each field on the target object.
+// If an error occurs while setting a field that does not exist, it is ignored.
+func setOptionalFields(target any, fields map[string]any) error {
+	for k, v := range fields {
+		if err := setOptionalField(target, k, v); err != nil {
+			return err
+		}
 	}
-	return bson.M{"_id": id}, nil
+	return nil
 }
 
 // getObjectID returns the ObjectID associated with the provided entity.
@@ -73,4 +75,14 @@ func getObjectID[T core.AbstractEntity](entity T) (primitive.ObjectID, error) {
 	}
 
 	return primitive.ObjectIDFromHex(v.GetID().(string))
+}
+
+// filterWithID returns a MongoDB filter that targets a specific document by its ID,
+// using the BSON format (bson.M{{"_id", ...}})
+func filterWithID[T core.AbstractEntity](entity T) (bson.M, error) {
+	id, err := getObjectID(entity)
+	if err != nil {
+		return nil, err
+	}
+	return bson.M{"_id": id}, nil
 }
