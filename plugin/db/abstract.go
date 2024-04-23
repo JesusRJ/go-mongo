@@ -35,10 +35,10 @@ func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error)
 }
 
 func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error) {
-	if err := setField(entity, "CreatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
-		return nil, err
-	}
-	if err := setField(entity, "UpdatedAt", time.Now()); err != nil && !errors.Is(err, ErrFieldNotFound) {
+	if err := setFields(entity, map[string]any{
+		"CreatedAt": time.Now(),
+		"UpdatedAt": time.Now(),
+	}); err != nil {
 		return nil, err
 	}
 
