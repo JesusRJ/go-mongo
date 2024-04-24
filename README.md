@@ -14,6 +14,12 @@ This project depends on the official MongoDB Go driver. Ensure you have it insta
 go get go.mongodb.org/mongo-driver/mongo
 ```
 
+## Roadmap
+
+- [] Enhace error handler
+- [] Add Logical Exclusion
+- [] Add cache reflection
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
