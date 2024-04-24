@@ -17,7 +17,7 @@ go get go.mongodb.org/mongo-driver/mongo
 ## Roadmap
 
 - [] Enhace error handler
-- [] Add Logical Exclusion
+- [] Support to soft delete (Logical Exclusion)
 - [] Add cache reflection
 
 ## License
