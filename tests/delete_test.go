@@ -19,13 +19,13 @@ func TestDelete(t *testing.T) {
 	}{
 		{
 			name:  "Success Primitive ID",
-			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticID[3])}),
-			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticID[3])}),
+			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticUserID[3])}),
+			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticUserID[3])}),
 		},
 		{
 			name:  "Success String ID",
-			input: GetUser("update", Config{ID: StaticID[4]}),
-			want:  GetUser("update", Config{ID: StaticID[4]}),
+			input: GetUser("update", Config{ID: StaticUserID[4]}),
+			want:  GetUser("update", Config{ID: StaticUserID[4]}),
 		},
 	}
 

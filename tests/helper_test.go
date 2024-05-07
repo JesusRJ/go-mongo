@@ -1,7 +1,7 @@
 package tests_test
 
 import (
-	"strconv"
+	"fmt"
 
 	. "github.com/jesusrj/go-mongo/utils/tests"
 )
@@ -9,21 +9,47 @@ import (
 type Config struct {
 	ID      any
 	Pets    int
-	Address string
+	Phones  int
+	Address *Address
+	Company *Company
 }
 
 func GetUser(name string, config Config) *User {
 	user := User{
-		Name:    name,
-		Address: "5th Avenue, number 123",
+		Name:  name,
+		Phone: PhoneNumbers(config.Phones),
+		Pets:  Pets(config.Pets),
 	}
 
 	user.ID = config.ID
-	user.Address = config.Address
 
-	for i := 0; i < config.Pets; i++ {
-		user.Pets = append(user.Pets, &Pet{Name: name + "_pet_" + strconv.Itoa(i+1)})
+	if config.Address != nil {
+		user.Address = config.Address
+	}
+
+	if config.Company != nil {
+		user.Company = config.Company
 	}
 
 	return &user
+}
+
+func PhoneNumbers(c int) (phones []*Phone) {
+	if c == 0 {
+		return nil
+	}
+	for x := range c {
+		phones = append(phones, &Phone{Number: fmt.Sprintf("(00) 0000-000%v", x)})
+	}
+	return phones
+}
+
+func Pets(c int) (pets []*Pet) {
+	if c == 0 {
+		return nil
+	}
+	for x := range c {
+		pets = append(pets, &Pet{Name: fmt.Sprintf("pet_%v", x)})
+	}
+	return pets
 }

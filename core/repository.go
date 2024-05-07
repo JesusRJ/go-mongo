@@ -2,6 +2,11 @@ package core
 
 import "context"
 
+type Repository[T, Q any] interface {
+	AbstractRepository[T]
+	AbstractPaginatedRepository[T, Q]
+}
+
 // AbstractEntity abstract entity interface
 type AbstractEntity interface {
 	GetID() any
@@ -9,7 +14,7 @@ type AbstractEntity interface {
 
 // AbstractRepository is an interface that defines basic CRUD (Create, Read, Update, Delete) operations
 // for entities that implement the AbstractEntity interface.
-type AbstractRepository[T AbstractEntity] interface {
+type AbstractRepository[T any] interface {
 	// Find retrieves an entity from the repository based on the provided context and the entity passed as a parameter.
 	// It returns a pointer to the found entity and an error, if any.
 	Find(ctx context.Context, entity *T) (*T, error)

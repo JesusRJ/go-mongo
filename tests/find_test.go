@@ -9,7 +9,7 @@ import (
 )
 
 func TestFind(t *testing.T) {
-	user := *GetUser("create", Config{ID: StaticID[0]})
+	user := *GetUser("create", Config{ID: StaticUserID[0]})
 	repository := db.NewRepository[User](Database.Collection(CollUser))
 
 	res, err := repository.Find(context.TODO(), &user)

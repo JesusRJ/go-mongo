@@ -19,13 +19,13 @@ func TestUpdate(t *testing.T) {
 	}{
 		{
 			name:  "Success Primitive ID",
-			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticID[1]), Address: "Avocato Str.", Pets: 4}),
-			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticID[1]), Address: "Avocato Str.", Pets: 4}),
+			input: GetUser("update", Config{ID: ObjectIDFromHex(StaticUserID[1]), Address: &Address{Street: "Avocato"}, Pets: 4}),
+			want:  GetUser("update", Config{ID: ObjectIDFromHex(StaticUserID[1]), Address: &Address{Street: "Avocato"}, Pets: 4}),
 		},
 		{
 			name:  "Success String ID",
-			input: GetUser("update", Config{ID: StaticID[2], Address: "Avocato Str."}),
-			want:  GetUser("update", Config{ID: StaticID[2], Address: "Avocato Str."}),
+			input: GetUser("update", Config{ID: StaticUserID[2], Address: &Address{Street: "Avocato"}}),
+			want:  GetUser("update", Config{ID: StaticUserID[2], Address: &Address{Street: "Avocato"}}),
 		},
 	}
 

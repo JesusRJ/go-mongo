@@ -44,12 +44,31 @@ func init() {
 // Populate database with tests values
 func seed() {
 	ctx := context.Background()
-	Database.Collection(CollUser).Drop(ctx)
 
-	repoUsers := db.NewRepository[User](Database.Collection(CollUser))
-	for x, v := range StaticID {
+	Database.Collection(CollUser).Drop(ctx)
+	Database.Collection(CollCompany).Drop(ctx)
+	Database.Collection(CollPet).Drop(ctx)
+
+	repoCompany := db.NewRepository[Company](Database.Collection(CollCompany))
+	repoUser := db.NewRepository[User](Database.Collection(CollUser))
+	repoPet := db.NewRepository[Pet](Database.Collection(CollPet))
+
+	cId, _ := primitive.ObjectIDFromHex(StaticCompanyID[0])
+	company := &Company{Entity: db.Entity{ID: cId}, Name: "My Petshop"}
+	repoCompany.Save(ctx, company)
+
+	for x, v := range StaticUserID {
 		if id, err := primitive.ObjectIDFromHex(v); err == nil {
-			repoUsers.Save(ctx, GetUser("user_"+strconv.Itoa(x), Config{ID: id}))
+			u, _ := repoUser.Save(ctx, GetUser("user_"+strconv.Itoa(x), Config{ID: id, Pets: 2, Company: company}))
+			for _, p := range u.Pets {
+				p.User = u
+				repoPet.Save(ctx, p)
+			}
 		}
 	}
+
+	// insert data for batch tests
+	// for x := range 500 {
+	// 	repoUsers.Save(ctx, GetUser("user_batch_"+strconv.Itoa(x), Config{}))
+	// }
 }
