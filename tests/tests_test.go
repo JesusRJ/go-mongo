@@ -17,7 +17,6 @@ import (
 const mongDSN = "mongodb://root:MongoPass321!@localhost:27017"
 
 var Database *mongo.Database
-var KnowledIDs []string
 
 func init() {
 	ctx := context.Background()

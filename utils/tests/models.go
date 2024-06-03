@@ -20,8 +20,8 @@ type User struct {
 	Name      string   `bson:"name"`
 	Address   *Address `bson:"address"` // embedded
 	Phone     []*Phone `bson:"phones"`  // embedded
-	Company   *Company `bson:"-"`
-	Pets      []*Pet   `bson:"-"`
+	Company   *Company `bson:"company" ref:"belongsTo,company,company_id,_id,user"`
+	Pets      []*Pet   `bson:"pets"    ref:"hasMany,pet,_id,user_id,pets"`
 }
 
 type Address struct {
@@ -30,13 +30,12 @@ type Address struct {
 }
 
 type Phone struct {
-	User   *User  `bson:"-"`
 	Number string `bson:"number"`
 }
 
 type Pet struct {
 	db.Entity `bson:"inline"`
-	User      *User  `bson:"-"`
+	User      *User  `bson:"user" ref:"belongsTo,user,user_id,_id,user"`
 	Name      string `bson:"name"`
 }
 
