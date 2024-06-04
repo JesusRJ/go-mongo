@@ -35,7 +35,7 @@ type Phone struct {
 
 type Pet struct {
 	db.Entity `bson:"inline"`
-	User      *User  `bson:"-" ref:"belongsTo,user,user_id,_id,user"`
+	User      *User  `bson:"user" ref:"belongsTo,user,user_id,_id,user"`
 	Name      string `bson:"name"`
 }
 
