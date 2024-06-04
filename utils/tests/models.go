@@ -35,22 +35,22 @@ type Phone struct {
 
 type Pet struct {
 	db.Entity `bson:"inline"`
-	User      *User  `bson:"user" ref:"belongsTo,user,user_id,_id,user"`
+	User      *User  `bson:"-" ref:"belongsTo,user,user_id,_id,user"`
 	Name      string `bson:"name"`
 }
 
-// LiteralEntity don't inherity from db.Entity but implements core.AbstractEntity
-type LiteralEntity struct {
+// RegularEntity don't inherity from db.Entity but implements core.AbstractEntity
+type RegularEntity struct {
 	ID    string `bson:"_id,omitempty"`
 	Name  string
 	Value uint
 }
 
-func (l LiteralEntity) GetID() any { return l.ID }
+func (l RegularEntity) GetID() any { return l.ID }
 
-type LiteralEntityWithoutID struct {
+type RegularEntityWithoutID struct {
 	Name  string
 	Value uint
 }
 
-func (l LiteralEntityWithoutID) GetID() any { return "" }
+func (l RegularEntityWithoutID) GetID() any { return "" }

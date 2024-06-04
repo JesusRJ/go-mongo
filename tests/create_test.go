@@ -38,10 +38,10 @@ func TestSave(t *testing.T) {
 	AssertObjEqual(t, user, newUser, "ID", "Name", "Address", "Pets")
 }
 
-func TestCreateLiteralWithID(t *testing.T) {
-	repository := db.NewRepository[LiteralEntity](Database.Collection(CollAny))
+func TestCreateRegularlWithID(t *testing.T) {
+	repository := db.NewRepository[RegularEntity](Database.Collection(CollAny))
 
-	entity := LiteralEntity{Name: "any name", Value: 10}
+	entity := RegularEntity{Name: "any name", Value: 10}
 	res, err := repository.Save(context.TODO(), &entity)
 	if err != nil {
 		t.Fatalf("errors happened when create: %v", err)
@@ -59,10 +59,10 @@ func TestCreateLiteralWithID(t *testing.T) {
 	AssertObjEqual(t, entity, newUser, "ID", "Name", "Value")
 }
 
-func TestCreateLiteralWithoutID(t *testing.T) {
-	repository := db.NewRepository[LiteralEntityWithoutID](Database.Collection(CollAny))
+func TestCreateRegularlWithoutID(t *testing.T) {
+	repository := db.NewRepository[RegularEntityWithoutID](Database.Collection(CollAny))
 
-	entity := LiteralEntityWithoutID{Name: "any name", Value: 10}
+	entity := RegularEntityWithoutID{Name: "any name", Value: 10}
 	res, err := repository.Save(context.TODO(), &entity)
 	if err != nil {
 		t.Fatalf("errors happened when create: %v", err)
