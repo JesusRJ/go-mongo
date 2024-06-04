@@ -7,11 +7,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type AbstractPaginatedRepository[T core.AbstractEntity, Q interface{}] struct {
+type AbstractPaginatedRepository[T core.Entity, Q interface{}] struct {
 	coll *mongo.Collection
 }
 
-func NewPaginatedRepository[T core.AbstractEntity, Q any](coll *mongo.Collection) core.AbstractPaginatedRepository[T, Q] {
+func NewPaginatedRepository[T core.Entity, Q any](coll *mongo.Collection) core.PaginatedRepository[T, Q] {
 	return &AbstractPaginatedRepository[T, Q]{
 		coll: coll,
 	}

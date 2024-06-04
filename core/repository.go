@@ -2,19 +2,19 @@ package core
 
 import "context"
 
-type Repository[T, Q any] interface {
-	AbstractRepository[T]
-	AbstractPaginatedRepository[T, Q]
+type FullRepository[T, Q any] interface {
+	Repository[T]
+	PaginatedRepository[T, Q]
 }
 
-// AbstractEntity abstract entity interface
-type AbstractEntity interface {
+// Entity abstract entity interface
+type Entity interface {
 	GetID() any
 }
 
-// AbstractRepository is an interface that defines basic CRUD (Create, Read, Update, Delete) operations
+// Repository is an interface that defines basic CRUD (Create, Read, Update, Delete) operations
 // for entities that implement the AbstractEntity interface.
-type AbstractRepository[T any] interface {
+type Repository[T any] interface {
 	// Find retrieves an entity from the repository based on the provided context and the entity passed as a parameter.
 	// It returns a pointer to the found entity and an error, if any.
 	Find(ctx context.Context, entity *T) (*T, error)
@@ -34,9 +34,9 @@ type AbstractRepository[T any] interface {
 	// Tx(ctx context.Context, fn func(ctx context.Context) error) error
 }
 
-// AbstractPaginatedRepository is an interface that defines a method for retrieving paginated results
+// PaginatedRepository is an interface that defines a method for retrieving paginated results
 // from the repository based on a query.
-type AbstractPaginatedRepository[T any, Q any] interface {
+type PaginatedRepository[T any, Q any] interface {
 	// FindAll retrieves paginated results from the repository based on the provided context and query.
 	// It takes a context and a query as parameters.
 	// It returns a PaginationQuery[T] object containing the paginated results and an error, if any.

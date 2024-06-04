@@ -15,6 +15,6 @@ type Entity struct {
 }
 
 // Ensure of Entity implements AbstractEntity
-var _ core.AbstractEntity = (*Entity)(nil)
+var _ core.Entity = (*Entity)(nil)
 
 func (e Entity) GetID() any { return e.ID }

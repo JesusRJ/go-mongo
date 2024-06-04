@@ -64,8 +64,8 @@ func setOptionalFields(target any, fields map[string]any) error {
 // If it is, it returns the ObjectID. Otherwise, it attempts to convert
 // the ID to an ObjectID from its hexadecimal representation.
 // Returns the ObjectID and an error, if any.
-func getObjectID[T core.AbstractEntity](entity T) (primitive.ObjectID, error) {
-	v, ok := any(entity).(core.AbstractEntity)
+func getObjectID[T core.Entity](entity T) (primitive.ObjectID, error) {
+	v, ok := any(entity).(core.Entity)
 	if !ok {
 		return primitive.ObjectID{}, ErrInvalidType
 	}
@@ -79,7 +79,7 @@ func getObjectID[T core.AbstractEntity](entity T) (primitive.ObjectID, error) {
 
 // filterWithID returns a MongoDB filter that targets a specific document by its ID,
 // using the BSON format (bson.M{{"_id", ...}})
-func filterWithID[T core.AbstractEntity](entity T) (bson.M, error) {
+func filterWithID[T core.Entity](entity T) (bson.M, error) {
 	id, err := getObjectID(entity)
 	if err != nil {
 		return nil, err

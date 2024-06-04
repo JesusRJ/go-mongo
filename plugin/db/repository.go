@@ -9,11 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type AbstractRepository[T core.AbstractEntity] struct {
+type AbstractRepository[T core.Entity] struct {
 	coll *mongo.Collection
 }
 
-func NewRepository[T core.AbstractEntity](coll *mongo.Collection) core.AbstractRepository[T] {
+func NewRepository[T core.Entity](coll *mongo.Collection) core.Repository[T] {
 	return &AbstractRepository[T]{
 		coll: coll,
 	}
