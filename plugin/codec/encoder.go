@@ -12,27 +12,31 @@ import (
 // ErrEncodeNil is the error returned when trying to encode a nil value
 var ErrEncodeNil = errors.New("cannot Encode nil value")
 
-type Enconder struct {
+type Encoder struct {
 	parser StructTagParser
 }
 
-func NewEnconder() (*Enconder, error) {
-	return &Enconder{
+func NewEncoder() (*Encoder, error) {
+	return &Encoder{
 		parser: DefaultStructTagParser,
 	}, nil
 }
 
-func (e *Enconder) Encode(val any) (any, error) {
+// TODO: AVALIAR SE OS CAMPOS SÃO EXPORTADOS
+func (e *Encoder) Encode(val any) (any, error) {
 	rval := reflect.ValueOf(val)
-	switch rval.Kind() {
-	case reflect.Ptr:
-		if rval.IsNil() {
-			return nil, ErrEncodeNil
-		}
+	if rval.Kind() == reflect.Ptr {
 		rval = rval.Elem()
-	default:
-		return nil, fmt.Errorf("argument to Decode must be a pointer or a map, but got %v", rval)
 	}
+	// switch rval.Kind() {
+	// case reflect.Ptr:
+	// 	if rval.IsNil() {
+	// 		return nil, ErrEncodeNil
+	// 	}
+	// 	rval = rval.Elem()
+	// default:
+	// 	return nil, fmt.Errorf("argument to Decode must be a pointer or a map, but got %v", rval)
+	// }
 
 	fields := []reflect.StructField{}
 	values := []any{}
@@ -55,6 +59,7 @@ func (e *Enconder) Encode(val any) (any, error) {
 				Type: reflect.TypeOf(primitive.NilObjectID),
 				Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, structTag.LocalField)),
 			}
+			// TODO: SE NÃO IMPLEMENTAR A INTERFACE core.Entity TENTAR PEGAR O FIELD ID
 			value = valueField.Interface().(core.Entity).GetID()
 		case HasMany:
 			// Ignore hasMany field on insert/update operation
