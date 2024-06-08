@@ -28,25 +28,17 @@ func (e *Encoder) Encode(val any) (any, error) {
 	if rval.Kind() == reflect.Ptr {
 		rval = rval.Elem()
 	}
-	// switch rval.Kind() {
-	// case reflect.Ptr:
-	// 	if rval.IsNil() {
-	// 		return nil, ErrEncodeNil
-	// 	}
-	// 	rval = rval.Elem()
-	// default:
-	// 	return nil, fmt.Errorf("argument to Decode must be a pointer or a map, but got %v", rval)
-	// }
 
 	fields := []reflect.StructField{}
 	values := []any{}
-	for x := range rval.NumField() {
+
+	for x := 0; x < rval.NumField(); x++ {
 		valueField := rval.Field(x)
 		typeField := rval.Type().Field(x)
 
 		structTag, err := e.parser.ParseStructTag(typeField)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		value := valueField.Interface()
@@ -59,11 +51,9 @@ func (e *Encoder) Encode(val any) (any, error) {
 				Type: reflect.TypeOf(primitive.NilObjectID),
 				Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, structTag.LocalField)),
 			}
-			// TODO: SE NÃO IMPLEMENTAR A INTERFACE core.Entity TENTAR PEGAR O FIELD ID
 			value = valueField.Interface().(core.Entity).GetID()
 		case HasMany:
-			// Ignore hasMany field on insert/update operation
-			continue
+			continue // Ignore hasMany fields
 		}
 
 		fields = append(fields, typeField)
