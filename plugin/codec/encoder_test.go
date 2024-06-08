@@ -10,9 +10,9 @@ import (
 var ownerID, _ = primitive.ObjectIDFromHex("66396fb0465065406a8f3229")
 
 type Product struct {
-	SKU   string
-	Owner Owner `ref:"belongsTo,owner,owner_id,_id"`
-	Price float32
+	SKU   string  `bson:"sku"`
+	Owner Owner   `ref:"belongsTo,owner,owner_id,_id"`
+	Price float32 `bson:"price"`
 }
 
 type Owner struct {
@@ -42,9 +42,9 @@ var testCases = []testCase{
 			Price: 399.0,
 		},
 		want: &struct {
-			SKU   string
+			SKU   string             `bson:"sku"`
 			Owner primitive.ObjectID `bson:"owner_id"`
-			Price float32
+			Price float32            `bson:"price"`
 		}{"AB12345", ownerID, 399.0},
 	},
 }
