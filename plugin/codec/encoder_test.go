@@ -41,7 +41,7 @@ var testCases = []testCase{
 			},
 			Price: 399.0,
 		},
-		want: &struct {
+		want: struct {
 			SKU   string             `bson:"sku"`
 			Owner primitive.ObjectID `bson:"owner_id"`
 			Price float32            `bson:"price"`
