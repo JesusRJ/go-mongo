@@ -12,6 +12,7 @@ import (
 // ErrEncodeNil is the error returned when trying to encode a nil value
 var ErrEncodeNil = errors.New("cannot Encode nil value")
 
+// tNilObjectID represents the reflect.Type of the primitive.NilObjectID.
 var tNilObjectID = reflect.TypeOf(primitive.NilObjectID)
 
 type Encoder struct {
