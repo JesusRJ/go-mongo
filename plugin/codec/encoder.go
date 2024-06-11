@@ -42,45 +42,45 @@ func (e *Encoder) extractFieldsAndValues(rval reflect.Value) ([]reflect.StructFi
 	var values []any
 
 	for i := 0; i < rval.NumField(); i++ {
-		valueField := rval.Field(i)
-		typeField := rval.Type().Field(i)
+		vField := rval.Field(i)
+		sField := rval.Type().Field(i)
 
-		structTag, err := e.parser.ParseStructTag(typeField)
+		structTag, err := e.parser.ParseStructTag(sField)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		value, updatedField := e.processField(valueField, typeField, structTag)
-		if updatedField == nil {
+		value, field := e.processField(vField, sField, structTag)
+		if field == nil {
 			continue // Ignore fields like HasMany
 		}
 
-		fields = append(fields, *updatedField)
+		fields = append(fields, *field)
 		values = append(values, value)
 	}
 
 	return fields, values, nil
 }
 
-func (e *Encoder) processField(valueField reflect.Value, typeField reflect.StructField, structTag StructTag) (any, *reflect.StructField) {
-	value := valueField.Interface()
+func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag StructTag) (any, *reflect.StructField) {
+	value := val.Interface()
 
-	switch structTag.Relation {
+	switch tag.Relation {
 	case BelongsTo:
 		// Convert field to primitive.ObjectID
-		typeField = reflect.StructField{
-			Name: typeField.Name,
+		sf = reflect.StructField{
+			Name: sf.Name,
 			Type: reflect.TypeOf(primitive.NilObjectID),
-			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, structTag.LocalField)),
+			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, tag.LocalField)),
 		}
-		if entity, ok := valueField.Interface().(core.Entity); ok {
+		if entity, ok := val.Interface().(core.Entity); ok {
 			value = entity.GetID()
 		}
 	case HasMany:
 		return nil, nil // Ignore fields like HasMany
 	}
 
-	return value, &typeField
+	return value, &sf
 }
 
 func (e *Encoder) createStruct(fields []reflect.StructField, values []any) any {
