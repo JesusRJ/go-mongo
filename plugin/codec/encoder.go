@@ -12,6 +12,8 @@ import (
 // ErrEncodeNil is the error returned when trying to encode a nil value
 var ErrEncodeNil = errors.New("cannot Encode nil value")
 
+var tNilObjectID = reflect.TypeOf(primitive.NilObjectID)
+
 type Encoder struct {
 	parser StructTagParser
 }
@@ -70,7 +72,7 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 		// Convert field to primitive.ObjectID
 		sf = reflect.StructField{
 			Name: sf.Name,
-			Type: reflect.TypeOf(primitive.NilObjectID),
+			Type: tNilObjectID,
 			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, tag.LocalField)),
 		}
 		if entity, ok := val.Interface().(core.Entity); ok {
