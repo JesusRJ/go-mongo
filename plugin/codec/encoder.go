@@ -54,10 +54,6 @@ func (e *Encoder) extractFieldsAndValues(rval reflect.Value) ([]reflect.StructFi
 		}
 
 		value, field := e.processField(vField, sField, structTag)
-		if field == nil {
-			continue // Ignore fields like HasMany
-		}
-
 		fields = append(fields, *field)
 		values = append(values, value)
 	}
@@ -80,7 +76,12 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 			value = entity.GetID()
 		}
 	case HasMany:
-		return nil, nil // Ignore fields like HasMany
+		// Ignore fields like HasMany
+		sf = reflect.StructField{
+			Name: sf.Name,
+			Type: sf.Type,
+			Tag:  reflect.StructTag(`bson:"-"`),
+		}
 	}
 
 	return value, &sf

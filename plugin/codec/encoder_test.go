@@ -10,12 +10,18 @@ import (
 var ownerID, _ = primitive.ObjectIDFromHex("66396fb0465065406a8f3229")
 
 type Product struct {
-	SKU   string  `bson:"sku"`
-	Owner Owner   `ref:"belongsTo,owner,owner_id,_id"`
-	Price float32 `bson:"price"`
+	SKU        string     `bson:"sku"`
+	Price      float32    `bson:"price"`
+	Owner      Owner      `ref:"belongsTo,owner,owner_id,_id"`
+	Categories []Category `ref:"hasMany,category,category_id,_id,categories"`
 }
 
 type Owner struct {
+	ID   primitive.ObjectID
+	Name string
+}
+
+type Category struct {
 	ID   primitive.ObjectID
 	Name string
 }
@@ -34,18 +40,20 @@ var testCases = []testCase{
 	{
 		name: "basic",
 		val: Product{
-			SKU: "AB12345",
+			SKU:   "AB12345",
+			Price: 399.0,
 			Owner: Owner{
 				ID:   ownerID,
 				Name: "Smith Jr.",
 			},
-			Price: 399.0,
+			Categories: []Category{},
 		},
 		want: struct {
-			SKU   string             `bson:"sku"`
-			Owner primitive.ObjectID `bson:"owner_id"`
-			Price float32            `bson:"price"`
-		}{"AB12345", ownerID, 399.0},
+			SKU        string             `bson:"sku"`
+			Price      float32            `bson:"price"`
+			Owner      primitive.ObjectID `bson:"owner_id"`
+			Categories []Category         `bson:"-"`
+		}{"AB12345", 399.0, ownerID, []Category{}},
 	},
 }
 
