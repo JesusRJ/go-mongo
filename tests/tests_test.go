@@ -14,14 +14,14 @@ import (
 	. "github.com/jesusrj/go-mongo/utils/tests"
 )
 
-const mongDSN = "mongodb://root:MongoPass321!@localhost:27017"
+const mongoDSN = "mongodb://root:MongoPass321!@localhost:27017"
 
 var Database *mongo.Database
 
 func init() {
 	ctx := context.Background()
 
-	clientOptions := options.Client().ApplyURI(mongDSN)
+	clientOptions := options.Client().ApplyURI(mongoDSN)
 
 	Client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
@@ -37,20 +37,18 @@ func init() {
 
 	Database = Client.Database("petshop")
 
-	seed()
+	seed(ctx)
 }
 
 // Populate database with tests values
-func seed() {
-	ctx := context.Background()
-
+func seed(ctx context.Context) {
 	Database.Collection(CollUser).Drop(ctx)
 	Database.Collection(CollCompany).Drop(ctx)
 	Database.Collection(CollPet).Drop(ctx)
 
-	repoCompany := db.NewRepository[Company](Database.Collection(CollCompany))
-	repoUser := db.NewRepository[User](Database.Collection(CollUser))
-	repoPet := db.NewRepository[Pet](Database.Collection(CollPet))
+	repoCompany, _ := db.NewRepository[Company](Database.Collection(CollCompany))
+	repoUser, _ := db.NewRepository[User](Database.Collection(CollUser))
+	repoPet, _ := db.NewRepository[Pet](Database.Collection(CollPet))
 
 	cId, _ := primitive.ObjectIDFromHex(StaticCompanyID[0])
 	company := &Company{Entity: db.Entity{ID: cId}, Name: "My Petshop"}

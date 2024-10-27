@@ -10,10 +10,13 @@ import (
 )
 
 func TestSave(t *testing.T) {
-	repository := db.NewRepository[User](Database.Collection(CollUser))
+	repository, err := db.NewRepository[User](Database.Collection(CollUser))
+	if err != nil {
+		t.Fatalf("errors happened when create repository: %v", err)
+	}
 
-	user := *GetUser("create", Config{})
-	res, err := repository.Save(context.TODO(), &user)
+	user := GetUser("create", Config{})
+	res, err := repository.Save(context.TODO(), user)
 	if err != nil {
 		t.Fatalf("errors happened when create: %v", err)
 	}
@@ -30,7 +33,7 @@ func TestSave(t *testing.T) {
 		t.Errorf("user's updated at should be not zero")
 	}
 
-	newUser, err := repository.Find(context.Background(), &user)
+	newUser, err := repository.Find(context.Background(), user)
 	if err != nil {
 		t.Fatalf("errors happened when find: %v", err)
 	}
@@ -39,7 +42,10 @@ func TestSave(t *testing.T) {
 }
 
 func TestCreateRegularlWithID(t *testing.T) {
-	repository := db.NewRepository[RegularEntity](Database.Collection(CollAny))
+	repository, err := db.NewRepository[RegularEntity](Database.Collection(CollAny))
+	if err != nil {
+		t.Fatalf("errors happened when create repository: %v", err)
+	}
 
 	entity := RegularEntity{Name: "any name", Value: 10}
 	res, err := repository.Save(context.TODO(), &entity)
@@ -60,7 +66,10 @@ func TestCreateRegularlWithID(t *testing.T) {
 }
 
 func TestCreateRegularlWithoutID(t *testing.T) {
-	repository := db.NewRepository[RegularEntityWithoutID](Database.Collection(CollAny))
+	repository, err := db.NewRepository[RegularEntityWithoutID](Database.Collection(CollAny))
+	if err != nil {
+		t.Fatalf("errors happened when create repository: %v", err)
+	}
 
 	entity := RegularEntityWithoutID{Name: "any name", Value: 10}
 	res, err := repository.Save(context.TODO(), &entity)

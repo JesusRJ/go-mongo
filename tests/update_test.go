@@ -10,7 +10,10 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
-	repository := db.NewRepository[User](Database.Collection(CollUser))
+	repository, err := db.NewRepository[User](Database.Collection(CollUser))
+	if err != nil {
+		t.Fatalf("errors happened when create repository: %v", err)
+	}
 
 	tt := []struct {
 		name  string

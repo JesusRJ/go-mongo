@@ -18,6 +18,9 @@ type Repository[T any] interface {
 	// Find retrieves an entity from the repository based on the provided context and the entity passed as a parameter.
 	// It returns a pointer to the found entity and an error, if any.
 	Find(ctx context.Context, entity *T) (*T, error)
+	// Find retrieves an entity from the repository based on the provided context and the entity's ID passed as a parameter.
+	// It returns a pointer to the found entity and an error, if any.
+	FindByID(ctx context.Context, entity *T) (*T, error)
 	// Save saves a new entity to the repository.
 	// It takes a context and a pointer to the entity to be saved.
 	// It returns a pointer to the saved entity and an error, if any.

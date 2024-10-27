@@ -63,11 +63,16 @@ func setOptionalFields(target any, fields map[string]any) error {
 // If the entity implements the interface, it checks if the ID is an ObjectID.
 // If it is, it returns the ObjectID. Otherwise, it attempts to convert
 // the ID to an ObjectID from its hexadecimal representation.
+// If ID is nil returns a NilObjectID and a ErrInvalidHex error.
 // Returns the ObjectID and an error, if any.
 func getObjectID[T core.Entity](entity T) (primitive.ObjectID, error) {
 	v, ok := any(entity).(core.Entity)
 	if !ok {
 		return primitive.ObjectID{}, ErrInvalidType
+	}
+
+	if v.GetID() == nil {
+		return primitive.NilObjectID, ErrInvalidHex
 	}
 
 	if id, ok := v.GetID().(primitive.ObjectID); ok {

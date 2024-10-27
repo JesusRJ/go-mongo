@@ -72,7 +72,7 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 			Type: tNilObjectID,
 			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, tag.LocalField)),
 		}
-		if entity, ok := val.Interface().(core.Entity); ok {
+		if entity, ok := value.(core.Entity); ok && !val.IsNil() {
 			value = entity.GetID()
 		}
 	case HasMany:
@@ -92,7 +92,8 @@ func (e *Encoder) createStruct(fields []reflect.StructField, values []any) any {
 	newStruct := reflect.New(dType).Elem()
 
 	for i, val := range values {
-		newStruct.Field(i).Set(reflect.ValueOf(val))
+		v := reflect.ValueOf(val)
+		newStruct.Field(i).Set(v)
 	}
 
 	return newStruct.Interface()

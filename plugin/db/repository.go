@@ -5,21 +5,43 @@ import (
 	"time"
 
 	"github.com/jesusrj/go-mongo/core"
+	"github.com/jesusrj/go-mongo/plugin/codec"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AbstractRepository[T core.Entity] struct {
 	coll *mongo.Collection
+	enc  *codec.Encoder
 }
 
-func NewRepository[T core.Entity](coll *mongo.Collection) core.Repository[T] {
+func NewRepository[T core.Entity](coll *mongo.Collection) (core.Repository[T], error) {
+	encoder, err := codec.NewEncoder()
+	if err != nil {
+		return nil, err
+	}
+
 	return &AbstractRepository[T]{
 		coll: coll,
-	}
+		enc:  encoder,
+	}, nil
 }
 
 func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error) {
+	filter, err := filterWithID(*entity)
+	if err != nil {
+		return nil, err
+	}
+
+	var result T
+	if err := a.coll.FindOne(ctx, filter).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	return &result, nil
+}
+
+func (a *AbstractRepository[T]) FindByID(ctx context.Context, entity *T) (*T, error) {
 	filter, err := filterWithID(*entity)
 	if err != nil {
 		return nil, err
@@ -39,7 +61,12 @@ func (a *AbstractRepository[T]) Save(ctx context.Context, entity *T) (*T, error)
 		return nil, err
 	}
 
-	res, err := a.coll.InsertOne(ctx, entity)
+	e, err := a.enc.Encode(entity)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := a.coll.InsertOne(ctx, e)
 	if err != nil {
 		return nil, err
 	}
