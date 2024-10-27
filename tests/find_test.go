@@ -12,19 +12,19 @@ import (
 func TestFindByID(t *testing.T) {
 	tt := []struct {
 		name    string
-		input   *User
+		input   any
 		want    string
 		wantErr bool
 	}{
 		{
 			name:    "without_id",
-			input:   GetUser("create", Config{}),
+			input:   nil,
 			want:    "000000000000000000000000",
 			wantErr: true,
 		},
 		{
 			name:  "with_id",
-			input: GetUser("create", Config{ID: StaticUserID[0]}),
+			input: StaticUserID[0],
 			want:  "661f17bffc35c18b2f85e975",
 		},
 	}
@@ -47,14 +47,14 @@ func TestFindByID(t *testing.T) {
 			}
 
 			if got != nil && got.ID == nil {
-				t.Errorf("user's primary key should has value after FindByID, got : %v", tc.input.ID)
+				t.Errorf("user's primary key should has value after FindByID, got : %v", got.ID)
 			}
 
 			if got != nil {
 				v, _ := got.ID.(primitive.ObjectID)
 				want, _ := primitive.ObjectIDFromHex(tc.want)
 				if v != want {
-					t.Errorf("user's primary key is wrong, want: %s, got : %v", tc.want, tc.input.ID)
+					t.Errorf("user's primary key is wrong, want: %s, got : %v", tc.want, tc.input)
 				}
 			}
 		})

@@ -41,8 +41,8 @@ func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error)
 	return &result, nil
 }
 
-func (a *AbstractRepository[T]) FindByID(ctx context.Context, entity *T) (*T, error) {
-	filter, err := filterWithID(*entity)
+func (a *AbstractRepository[T]) FindByID(ctx context.Context, id any) (*T, error) {
+	filter, err := filterWithID(Entity{ID: id})
 	if err != nil {
 		return nil, err
 	}
