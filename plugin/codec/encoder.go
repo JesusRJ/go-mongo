@@ -66,28 +66,20 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 
 	switch tag.Relation {
 	case BelongsTo:
-		// Convert field to primitive.ObjectID
+		// Create a new definition for the field, replacing it with ObjectID type and bson tag
 		sf = reflect.StructField{
 			Name: sf.Name,
 			Type: tNilObjectID,
 			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, tag.LocalField)),
 		}
+
+		// Converte o valor do campo para um ObjectID, se for uma entidade
 		if entity, ok := value.(core.Entity); ok {
-			value = nil // default
-			if val.Kind() == reflect.Pointer {
-				if !val.IsNil() {
-					id := entity.GetID().(primitive.ObjectID)
-					value = &id
-				}
-			} else {
-				if id := entity.GetID(); id != nil {
-					oid := id.(primitive.ObjectID)
-					value = &oid
-				}
-			}
+			value = convertEntityToObjectID(val, entity)
 		}
+
 	case HasMany:
-		// Ignore fields like HasMany
+		// Set the struct field to ignore the field in MongoDB using tag "bson:\"-\""
 		sf = reflect.StructField{
 			Name: sf.Name,
 			Type: sf.Type,
@@ -117,4 +109,24 @@ func (e *Encoder) createStruct(fields []reflect.StructField, values []any) (any,
 	}
 
 	return structValue.Interface(), nil
+}
+
+// Auxiliary function to convert an entity into an ObjectID
+func convertEntityToObjectID(val reflect.Value, entity core.Entity) any {
+	if val.Kind() == reflect.Pointer {
+		if !val.IsNil() {
+			if id := entity.GetID(); id != nil {
+				if oid, ok := id.(primitive.ObjectID); ok {
+					return &oid
+				}
+			}
+		}
+	} else {
+		if id := entity.GetID(); id != nil {
+			if oid, ok := id.(primitive.ObjectID); ok {
+				return &oid
+			}
+		}
+	}
+	return nil
 }
