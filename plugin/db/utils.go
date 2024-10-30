@@ -5,20 +5,30 @@ import (
 	"reflect"
 
 	"github.com/jesusrj/go-mongo/core"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+var NilObjectID = primitive.NilObjectID
 
 // TODO: Cache reflection fields to tunning performance
 
 func setField(target any, fieldName string, value any) error {
-	v := reflect.ValueOf(target).Elem()
+	v := reflect.ValueOf(target)
+	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
+		return ErrInvalidTarget
+	}
+
+	v = v.Elem()
 	if !v.CanAddr() {
 		return ErrNotAddressable
 	}
+
 	field := v.FieldByName(fieldName)
 	if !field.IsValid() {
 		return ErrFieldNotFound
+	}
+	if !field.CanSet() {
+		return ErrFieldCannotBeSet
 	}
 
 	if _, ok := value.(primitive.ObjectID); ok {
@@ -26,14 +36,18 @@ func setField(target any, fieldName string, value any) error {
 			field.SetString(value.(primitive.ObjectID).Hex())
 			return nil
 		}
+		if field.Kind() == reflect.Interface {
+			field.Set(reflect.ValueOf(value))
+			return nil
+		}
 	}
 
-	if value == nil {
-		field.Set(reflect.Zero(v.Type()))
-		return nil
+	val := reflect.ValueOf(value)
+	if field.Type() != val.Type() {
+		return ErrIncorrectTypeForField
 	}
 
-	field.Set(reflect.ValueOf(value))
+	field.Set(val)
 	return nil
 }
 
@@ -72,7 +86,7 @@ func getObjectID[T core.Entity](entity T) (primitive.ObjectID, error) {
 	}
 
 	if v.GetID() == nil {
-		return primitive.NilObjectID, ErrInvalidHex
+		return NilObjectID, ErrInvalidHex
 	}
 
 	if id, ok := v.GetID().(primitive.ObjectID); ok {
@@ -80,14 +94,4 @@ func getObjectID[T core.Entity](entity T) (primitive.ObjectID, error) {
 	}
 
 	return primitive.ObjectIDFromHex(v.GetID().(string))
-}
-
-// filterWithID returns a MongoDB filter that targets a specific document by its ID,
-// using the BSON format (bson.M{{"_id", ...}})
-func filterWithID[T core.Entity](entity T) (bson.M, error) {
-	id, err := getObjectID(entity)
-	if err != nil {
-		return nil, err
-	}
-	return bson.M{"_id": id}, nil
 }

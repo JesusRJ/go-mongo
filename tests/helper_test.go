@@ -2,6 +2,7 @@ package tests_test
 
 import (
 	"fmt"
+	"reflect"
 
 	. "github.com/jesusrj/go-mongo/utils/tests"
 )
@@ -27,7 +28,11 @@ func GetUser(name string, config Config) *User {
 		user.Address = config.Address
 	}
 
-	if config.Company != nil {
+	// if config.Company != nil {
+	// 	user.Company = config.Company
+	// }
+
+	if !reflect.ValueOf(config.Company).IsZero() {
 		user.Company = config.Company
 	}
 

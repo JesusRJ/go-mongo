@@ -13,7 +13,7 @@ import (
 var ErrEncodeNil = errors.New("cannot Encode nil value")
 
 // tNilObjectID represents the reflect.Type of the primitive.NilObjectID.
-var tNilObjectID = reflect.TypeOf(primitive.NilObjectID)
+var tNilObjectID = reflect.TypeOf(&primitive.NilObjectID)
 
 type Encoder struct {
 	parser StructTagParser
@@ -37,7 +37,7 @@ func (e *Encoder) Encode(val any) (any, error) {
 		return nil, err
 	}
 
-	return e.createStruct(fields, values), nil
+	return e.createStruct(fields, values)
 }
 
 func (e *Encoder) extractFieldsAndValues(rval reflect.Value) ([]reflect.StructField, []any, error) {
@@ -72,8 +72,19 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 			Type: tNilObjectID,
 			Tag:  reflect.StructTag(fmt.Sprintf(`bson:"%s"`, tag.LocalField)),
 		}
-		if entity, ok := value.(core.Entity); ok && !val.IsNil() {
-			value = entity.GetID()
+		if entity, ok := value.(core.Entity); ok {
+			value = nil // default
+			if val.Kind() == reflect.Pointer {
+				if !val.IsNil() {
+					id := entity.GetID().(primitive.ObjectID)
+					value = &id
+				}
+			} else {
+				if id := entity.GetID(); id != nil {
+					oid := id.(primitive.ObjectID)
+					value = &oid
+				}
+			}
 		}
 	case HasMany:
 		// Ignore fields like HasMany
@@ -87,14 +98,23 @@ func (e *Encoder) processField(val reflect.Value, sf reflect.StructField, tag St
 	return value, &sf
 }
 
-func (e *Encoder) createStruct(fields []reflect.StructField, values []any) any {
-	dType := reflect.StructOf(fields)
-	newStruct := reflect.New(dType).Elem()
+func (e *Encoder) createStruct(fields []reflect.StructField, values []any) (any, error) {
+	structType := reflect.StructOf(fields)
+	structValue := reflect.New(structType).Elem()
 
-	for i, val := range values {
-		v := reflect.ValueOf(val)
-		newStruct.Field(i).Set(v)
+	for i, field := range fields {
+		if values[i] == nil {
+			continue
+		}
+		fieldValue := reflect.ValueOf(values[i])
+
+		if field.Type != fieldValue.Type() {
+			return nil, fmt.Errorf("incorrect type for field %s: expected %s but got %s",
+				field.Name, field.Type, fieldValue.Type())
+		}
+
+		structValue.Field(i).Set(fieldValue)
 	}
 
-	return newStruct.Interface()
+	return structValue.Interface(), nil
 }

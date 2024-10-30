@@ -58,7 +58,7 @@ func seed(ctx context.Context) {
 		if id, err := primitive.ObjectIDFromHex(v); err == nil {
 			u, _ := repoUser.Save(ctx, GetUser("user_"+strconv.Itoa(x), Config{ID: id, Pets: 2, Company: company}))
 			for _, p := range u.Pets {
-				p.User = u
+				p.User = *u
 				repoPet.Save(ctx, p)
 			}
 		}
