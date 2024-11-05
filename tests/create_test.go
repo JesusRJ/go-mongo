@@ -38,16 +38,16 @@ func TestSaveWithPointerRef(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			res, err := repository.Save(context.TODO(), tc.input)
+			got, err := repository.Save(context.TODO(), tc.input)
 			if err != nil {
 				t.Fatalf("errors happened when create: %v", err)
 			}
 
-			if res.ID == nil || res.ID == "" {
+			if got.ID == nil || got.ID == "" {
 				t.Errorf("user's primary key should has value after create, got : %v", tc.input.ID)
 			}
 
-			if res.CreatedAt.IsZero() {
+			if got.CreatedAt.IsZero() {
 				t.Errorf("user's created at should be not zero")
 			}
 
@@ -55,7 +55,7 @@ func TestSaveWithPointerRef(t *testing.T) {
 				t.Errorf("user's updated at should be not zero")
 			}
 
-			newUser, err := repository.Find(context.Background(), tc.input)
+			newUser, err := repository.FindByID(context.Background(), tc.input.GetID())
 			if err != nil {
 				t.Fatalf("errors happened when find: %v", err)
 			}
@@ -63,7 +63,6 @@ func TestSaveWithPointerRef(t *testing.T) {
 			AssertObjEqual(t, tc.input, newUser, tc.fields...)
 		})
 	}
-
 }
 
 func TestSaveWithoutPointerRef(t *testing.T) {
@@ -113,7 +112,7 @@ func TestSaveWithoutPointerRef(t *testing.T) {
 				t.Errorf("user's updated at should be not zero")
 			}
 
-			newPet, err := repository.Find(context.Background(), &tc.input)
+			newPet, err := repository.FindByID(context.Background(), tc.input.GetID())
 			if err != nil {
 				t.Fatalf("errors happened when find: %v", err)
 			}
@@ -139,7 +138,7 @@ func TestCreateRegularlWithID(t *testing.T) {
 		t.Errorf("primary key should has value after create, got : %v", entity.ID)
 	}
 
-	newUser, err := repository.Find(context.Background(), &entity)
+	newUser, err := repository.FindByID(context.Background(), entity.GetID())
 	if err != nil {
 		t.Fatalf("errors happened when find: %v", err)
 	}
