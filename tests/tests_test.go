@@ -37,7 +37,7 @@ func init() {
 
 	Database = Client.Database("petshop")
 
-	seed(ctx)
+	// seed(ctx)
 }
 
 // Populate database with tests values

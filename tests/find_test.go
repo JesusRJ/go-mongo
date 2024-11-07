@@ -59,5 +59,52 @@ func TestFindByID(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestFind(t *testing.T) {
+	tt := []struct {
+		name    string
+		input   *User
+		fields  []string
+		wantErr bool
+	}{
+		// {
+		// 	name:    "nil_input",
+		// 	input:   nil,
+		// 	wantErr: true,
+		// },
+		{
+			name: "with_name",
+			input: &User{
+				Entity: db.Entity{ID: ObjectIDFromHex(StaticUserID[0])},
+				Name:   "user_0",
+			},
+			fields: []string{"Name"},
+		},
+	}
+
+	repository, err := db.NewRepository[User](Database.Collection(CollUser))
+	if err != nil {
+		t.Fatalf("errors happened when create repository: %v", err)
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := repository.Find(context.TODO(), tc.input)
+
+			if err == nil && tc.wantErr {
+				t.Fatalf("a error is expected when run Find")
+			}
+
+			if err != nil && !tc.wantErr {
+				t.Fatalf("errors happened when run Find: %v", err)
+			}
+
+			if got != nil && got.ID == nil {
+				t.Errorf("user's primary key should has value after FindByID, got : %v", got.ID)
+			}
+
+			AssertObjEqual(t, tc.input, got, tc.fields...)
+		})
+	}
 }

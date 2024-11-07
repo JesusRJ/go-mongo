@@ -28,10 +28,7 @@ func NewRepository[T core.Entity](coll *mongo.Collection) (core.Repository[T], e
 }
 
 func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error) {
-	filter, err := filterWithID(*entity)
-	if err != nil {
-		return nil, err
-	}
+	filter := filterWithFields(*entity)
 
 	var result T
 	if err := a.coll.FindOne(ctx, filter).Decode(&result); err != nil {
