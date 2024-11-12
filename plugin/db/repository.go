@@ -28,7 +28,7 @@ func NewRepository[T core.Entity](coll *mongo.Collection) (core.Repository[T], e
 }
 
 func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error) {
-	filter := filterWithFields(*entity)
+	filter := filterWithFields(entity)
 
 	var result T
 	if err := a.coll.FindOne(ctx, filter).Decode(&result); err != nil {
@@ -80,7 +80,7 @@ func (a *AbstractRepository[T]) Update(ctx context.Context, entity *T) (*T, erro
 		return nil, err
 	}
 
-	id, err := getObjectID(*entity)
+	id, err := getObjectID(entity)
 	if err != nil {
 		return nil, err
 	}

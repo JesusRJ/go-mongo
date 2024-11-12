@@ -79,7 +79,7 @@ func setOptionalFields(target any, fields map[string]any) error {
 // the ID to an ObjectID from its hexadecimal representation.
 // If ID is nil returns a NilObjectID and a ErrInvalidHex error.
 // Returns the ObjectID and an error, if any.
-func getObjectID[T core.Entity](entity T) (primitive.ObjectID, error) {
+func getObjectID(entity any) (primitive.ObjectID, error) {
 	v, ok := any(entity).(core.Entity)
 	if !ok {
 		return primitive.ObjectID{}, ErrInvalidType

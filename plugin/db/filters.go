@@ -9,7 +9,7 @@ import (
 
 // filterWithID returns a MongoDB filter that targets a specific document by its ID,
 // using the BSON format (bson.M{{"_id", ...}})
-func filterWithID[T core.Entity](entity T) (bson.M, error) {
+func filterWithID(entity any) (bson.M, error) {
 	id, err := getObjectID(entity)
 	if err != nil {
 		return nil, err
@@ -17,8 +17,12 @@ func filterWithID[T core.Entity](entity T) (bson.M, error) {
 	return bson.M{"_id": id}, nil
 }
 
-func filterWithFields[T core.Entity](entity T) bson.M {
+func filterWithFields(entity any) bson.M {
 	rval := reflect.ValueOf(entity)
+	if rval.Kind() == reflect.Pointer {
+		rval = rval.Elem()
+	}
+
 	rtype := rval.Type()
 
 	result := make(map[string]any)
@@ -29,6 +33,8 @@ func filterWithFields[T core.Entity](entity T) bson.M {
 			result["_id"] = v.GetID()
 		}
 	}
+
+	// NÃO ESTÁ FILTRANDO POR STRING APOS REMOVER GENERICS
 
 	// Add additional fields to filter
 	if rtype.Kind() == reflect.Struct {
@@ -43,10 +49,14 @@ func filterWithFields[T core.Entity](entity T) bson.M {
 				}
 			}
 
-			// Skip empty slices, maps or arrays
+			// Skip empty strings, slices, maps or arrays
 			switch value.Kind() {
 			case reflect.Slice, reflect.Map, reflect.Array:
 				if value.Len() == 0 {
+					continue
+				}
+			case reflect.String:
+				if value.String() == "" {
 					continue
 				}
 			}

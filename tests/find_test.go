@@ -104,7 +104,7 @@ func TestFind(t *testing.T) {
 				t.Errorf("user's primary key should has value after FindByID, got : %v", got.ID)
 			}
 
-			AssertObjEqual(t, tc.input, got, tc.fields...)
+			AssertObjEqual(t, got, tc.input, tc.fields...)
 		})
 	}
 }
