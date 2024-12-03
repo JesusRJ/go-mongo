@@ -90,7 +90,7 @@ func TestFind(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := repository.FindOne(context.TODO(), tc.input)
+			got, err := repository.Find(context.TODO(), tc.input)
 
 			if err == nil && tc.wantErr {
 				t.Fatalf("a error is expected when run Find")

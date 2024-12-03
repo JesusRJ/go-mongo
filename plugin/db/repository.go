@@ -27,7 +27,7 @@ func NewRepository[T core.Entity](coll *mongo.Collection) (core.Repository[T], e
 	}, nil
 }
 
-func (a *AbstractRepository[T]) FindOne(ctx context.Context, entity *T) (*T, error) {
+func (a *AbstractRepository[T]) Find(ctx context.Context, entity *T) (*T, error) {
 	filter := filterWithFields(entity)
 
 	var result T

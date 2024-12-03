@@ -15,9 +15,9 @@ type Entity interface {
 // Repository is an interface that defines basic CRUD (Create, Read, Update, Delete) operations
 // for entities that implement the AbstractEntity interface.
 type Repository[T any] interface {
-	// FindOne retrieves an entity from the repository based on the provided context and the entity passed as a parameter.
+	// Find retrieves an entity from the repository based on the provided context and the entity passed as a parameter.
 	// It returns a pointer to the found entity and an error, if any.
-	FindOne(ctx context.Context, entity *T) (*T, error)
+	Find(ctx context.Context, entity *T) (*T, error)
 	// Find retrieves an entity from the repository based on the provided context and the entity's ID passed as a parameter.
 	// It returns a pointer to the found entity and an error, if any.
 	FindByID(ctx context.Context, id any) (*T, error)
