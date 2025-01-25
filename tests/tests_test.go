@@ -37,14 +37,14 @@ func init() {
 
 	Database = Client.Database("petshop")
 
-	// seed(ctx)
+	seed(ctx)
 }
 
 // Populate database with tests values
 func seed(ctx context.Context) {
-	Database.Collection(CollUser).Drop(ctx)
-	Database.Collection(CollCompany).Drop(ctx)
-	Database.Collection(CollPet).Drop(ctx)
+	_ = Database.Collection(CollUser).Drop(ctx)
+	_ = Database.Collection(CollCompany).Drop(ctx)
+	_ = Database.Collection(CollPet).Drop(ctx)
 
 	repoCompany, _ := db.NewRepository[Company](Database.Collection(CollCompany))
 	repoUser, _ := db.NewRepository[User](Database.Collection(CollUser))
@@ -52,20 +52,26 @@ func seed(ctx context.Context) {
 
 	cId, _ := primitive.ObjectIDFromHex(StaticCompanyID[0])
 	company := &Company{Entity: db.Entity{ID: cId}, Name: "My Petshop"}
-	repoCompany.Save(ctx, company)
+	if _, err := repoCompany.Save(ctx, company); err != nil {
+		log.Printf("error creating company, got error: %+v", err)
+	}
 
 	for x, v := range StaticUserID {
 		if id, err := primitive.ObjectIDFromHex(v); err == nil {
 			u, _ := repoUser.Save(ctx, GetUser("user_"+strconv.Itoa(x), Config{ID: id, Pets: 2, Company: company}))
 			for _, p := range u.Pets {
 				p.User = *u
-				repoPet.Save(ctx, p)
+				if _, err := repoPet.Save(ctx, p); err != nil {
+					log.Printf("error creating pet, got error: %+v", err)
+				}
 			}
 		}
 	}
 
 	// insert data for batch tests
-	// for x := range 500 {
-	// 	repoUsers.Save(ctx, GetUser("user_batch_"+strconv.Itoa(x), Config{}))
-	// }
+	for x := range 500 {
+		if _, err := repoUser.Save(ctx, GetUser("user_batch_"+strconv.Itoa(x), Config{})); err != nil {
+			log.Printf("error creating pet, got error: %+v", err)
+		}
+	}
 }

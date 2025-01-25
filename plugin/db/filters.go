@@ -34,7 +34,7 @@ func filterWithFields(entity any) bson.M {
 		}
 	}
 
-	// NÃO ESTÁ FILTRANDO POR STRING APOS REMOVER GENERICS
+	// BUG: NÃO ESTÁ FILTRANDO POR STRING APOS REMOVER GENERICS
 
 	// Add additional fields to filter
 	if rtype.Kind() == reflect.Struct {

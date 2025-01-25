@@ -1,14 +1,18 @@
 package core
 
-type PaginationQuery[T any] struct {
-	Page    int
-	PerPage int
-	Order   OrderBy
-	Query   *T
+var (
+	_defaultPage int32 = 1
+	_defaultSize int64 = 10
+)
+
+type QueryOptions struct {
+	Page     *int32
+	PageSize *int64
+	Order    *OrderBy
 }
 
 type OrderBy struct {
-	Direction string
+	Direction int32
 	Field     string
 }
 
@@ -17,4 +21,27 @@ type Pagination[T any] struct {
 	Pages int `json:"pages"`
 	Total int `json:"total"`
 	Data  []T `json:"data"`
+}
+
+// Find creates a new FindOptions instance.
+func Options() *QueryOptions {
+	return &QueryOptions{
+		Page:     &_defaultPage,
+		PageSize: &_defaultSize,
+	}
+}
+
+func (q *QueryOptions) SetPage(i int32) *QueryOptions {
+	q.Page = &i
+	return q
+}
+
+func (q *QueryOptions) SetPageSize(i int64) *QueryOptions {
+	q.PageSize = &i
+	return q
+}
+
+func (q *QueryOptions) SetOrder(o OrderBy) *QueryOptions {
+	q.Order = &o
+	return q
 }

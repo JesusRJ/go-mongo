@@ -28,10 +28,6 @@ func GetUser(name string, config Config) *User {
 		user.Address = config.Address
 	}
 
-	// if config.Company != nil {
-	// 	user.Company = config.Company
-	// }
-
 	if !reflect.ValueOf(config.Company).IsZero() {
 		user.Company = config.Company
 	}

@@ -43,5 +43,5 @@ type PaginatedRepository[T any, Q any] interface {
 	// FindAll retrieves paginated results from the repository based on the provided context and query.
 	// It takes a context and a query as parameters.
 	// It returns a PaginationQuery[T] object containing the paginated results and an error, if any.
-	FindAll(ctx context.Context, query Q) (*PaginationQuery[T], error)
+	FindAll(ctx context.Context, query Q, opts QueryOptions) (*Pagination[T], error)
 }
