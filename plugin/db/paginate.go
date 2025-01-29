@@ -73,3 +73,5 @@ func findOptions(opts core.QueryOptions) *options.FindOptions {
 
 	return o
 }
+
+// ref: https://github.com/gobeam/mongo-go-pagination
