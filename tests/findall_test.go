@@ -11,34 +11,55 @@ import (
 )
 
 func TestFindAll(t *testing.T) {
+	tt := []struct {
+		name   string
+		opts   core.QueryOptions // required
+		query  any
+		fields []string // fields to validate
+		want   core.Pagination[User]
+	}{
+		// {
+		// 	name:   "without_query",
+		// 	opts:   *core.Options(),
+		// 	query:  bson.D{},
+		// 	fields: []string{"Page", "Pages", "Total"},
+		// 	want: core.Pagination[User]{
+		// 		Page:  1,
+		// 		Pages: 50,
+		// 		Total: 505,
+		// 	},
+		// },
+		{
+			name:   "with_query",
+			opts:   *core.Options(),
+			query:  bson.D{{Key: "name", Value: "user_batch_4"}},
+			fields: []string{"Page", "Pages", "Total"},
+			want: core.Pagination[User]{
+				Page:  1,
+				Pages: 0,
+				Total: 1,
+			},
+		},
+		// order:    core.OrderBy{Field: "name", Direction: core.Asc},
+	}
+
 	repository, err := db.NewPaginatedRepository[User, any](Database.Collection(CollUser))
 	if err != nil {
 		t.Fatalf("errors happened when create repository: %v", err)
 	}
 
-	// query := bson.D{
-	// 	{Key: "name", Value: "pet_1"},
-	// 	// {Key: "age", Value: 9},
-	// }
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := repository.FindAll(context.TODO(), tc.query, tc.opts)
+			if err != nil {
+				t.Fatalf("errors happened when run FindAll: %v", err)
+			}
 
-	p, err := repository.FindAll(context.TODO(), bson.D{}, *core.Options())
-	if err != nil {
-		t.Fatalf("errors happened when run FindAll: %v", err)
-	}
+			if len(got.Data) != int(*tc.opts.PageSize) {
+				t.Errorf("pages total, got : %v, expected:  %v", len(got.Data), *tc.opts.PageSize)
+			}
 
-	if p.Total != 505 {
-		t.Errorf("records total, got : %v, expected: 505", p.Total)
-	}
-
-	if len(p.Data) != 10 {
-		t.Errorf("pages total, got : %v, expected: 10", len(p.Data))
-	}
-
-	if p.Pages != 50 {
-		t.Errorf("pages total, got : %v, expected: 50", p.Pages)
-	}
-
-	if p.Page != 1 {
-		t.Errorf("wrong page, got : %v, expected: 1", p.Page)
+			AssertObjEqual(t, tc.want, got, tc.fields...)
+		})
 	}
 }

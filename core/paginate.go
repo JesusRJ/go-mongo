@@ -11,6 +11,11 @@ type QueryOptions struct {
 	Order    *OrderBy
 }
 
+const (
+	Asc  int32 = 1
+	Desc int32 = -1
+)
+
 type OrderBy struct {
 	Direction int32
 	Field     string

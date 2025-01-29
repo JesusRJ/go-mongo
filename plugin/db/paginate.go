@@ -46,9 +46,11 @@ func (a *AbstractPaginatedRepository[T, Q]) FindAll(ctx context.Context, query Q
 		return nil, err
 	}
 
+	pages := int(count) / int(*opts.PageSize)
+
 	return &core.Pagination[T]{
 		Page:  int(*opts.Page),
-		Pages: int(count) / int(*opts.PageSize),
+		Pages: pages,
 		Total: int(count),
 		Data:  result,
 	}, nil
