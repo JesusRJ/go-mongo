@@ -1,6 +1,10 @@
 package tests
 
-import "github.com/jesusrj/go-mongo/plugin/db"
+import (
+	"time"
+
+	"github.com/jesusrj/go-mongo/plugin/db"
+)
 
 const (
 	// Collection names
@@ -17,11 +21,12 @@ type Company struct {
 
 type User struct {
 	db.Entity `bson:"inline"`
-	Name      string   `bson:"name"`
-	Address   *Address `bson:"address"` // embedded
-	Phone     []*Phone `bson:"phones"`  // embedded
-	Company   *Company `bson:"company" ref:"belongsTo,company,company_id,_id,user"`
-	Pets      []*Pet   `bson:"pets"    ref:"hasMany,pet,_id,user_id,pets"`
+	Name      string    `bson:"name"`
+	Address   *Address  `bson:"address"` // embedded
+	Phone     []*Phone  `bson:"phones"`  // embedded
+	Company   *Company  `bson:"company" ref:"belongsTo,company,company_id,_id,user"`
+	Pets      []*Pet    `bson:"pets"    ref:"hasMany,pet,_id,user_id,pets"`
+	Login     time.Time `bson:"login_time"`
 }
 
 type Address struct {

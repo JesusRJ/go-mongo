@@ -59,6 +59,12 @@ func filterWithFields(entity any) bson.M {
 				if value.String() == "" {
 					continue
 				}
+			case reflect.Struct:
+				// skip struct with zero value
+				// if value.Interface() == reflect.Zero(value.Type()).Interface() {
+				if value.IsZero() {
+					continue
+				}
 			}
 
 			// Get the bson tag or use the field name if no bson tag is specified
